@@ -1,0 +1,1 @@
+{"rule":"ST_03_001","sentence":"^\\QAd ogni modo, a prescindere dall'opzione scelta, ci incontreremo tutti al Posteggio dell'Alpe Grande alle ore 16:00 per salire insieme a piedi fino alla cima del Monte Crocione.\\E$"}
