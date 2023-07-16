@@ -1,0 +1,13 @@
+# Modes:
+#	Test 0
+#	Flight 1
+mode=1
+
+# Logging frequency [Hz]
+logging_frequency=2
+
+# Sea level pressure [hPa]
+sea_level_pressure=1013.25
+
+# Buzzer frequency at landing
+buzzer_frequency=0.5
