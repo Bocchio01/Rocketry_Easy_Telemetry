@@ -3,12 +3,11 @@
 #include <SPI.h>
 #include <SD.h>
 
-#define doBeep true
+#define doBeep false
 
-#define defaultMode 0                   // Flight->0 / Test->1
-#define defaultloggingFrequency 2       // [Hz]
-#define defaultSeaLevelPressure 101325  // [Pa]
-
+#define seaLevelPressure 101325  // [Pa]
+#define logsPerSecond 10
+#define minutesAtStopLogging 2
 #define positiveDelay 100
 #define negativeDelay 3000
 #define landOffDelay 1000
@@ -17,15 +16,11 @@
 #define buzzerPin 6
 
 Adafruit_BMP085 bmp;
-char completeFileName[32], fileName[16];
+char completeFileName[32], fileName[16] = "FLIGHT";
 int16_t dataIndex = 0;
 int16_t AccX, AccY, AccZ;
 int32_t Pressure;
 float Temperature, Altitude;
-
-int mode = defaultMode;
-int loggingFrequency = defaultloggingFrequency;
-float seaLevelPressure = defaultSeaLevelPressure;
 
 
 void setup() {
@@ -38,20 +33,6 @@ void setup() {
   // Wait for Serial
   while (!Serial) {}
   Serial.begin(9600);
-
-  // Wait for SD
-  do {
-    SD_flag = SD.begin(SD_sckPin);
-    if (SD_flag) {
-      Serial.println("SD module connected!");
-      doBuzzer(positiveDelay);
-    } else {
-      Serial.println("Could not find SD module!");
-      doBuzzer(negativeDelay);
-      delay(1000);
-    }
-  } while (!SD_flag);
-  delay(1000);
 
   // Wait for BMP180
   do {
@@ -86,16 +67,18 @@ void setup() {
   delay(1000);
 
 
-  // Load configurations
-  readConfigFile();
-  switch (mode) {
-    case 0:
-      strcpy(fileName, "FLIGHT");
-      break;
-    case 1:
-      strcpy(fileName, "TEST");
-      break;
-  }
+  // Wait for SD
+  do {
+    SD_flag = SD.begin(SD_sckPin);
+    if (SD_flag) {
+      Serial.println("SD module connected!");
+      doBuzzer(positiveDelay);
+    } else {
+      Serial.println("Could not find SD module!");
+      doBuzzer(negativeDelay);
+      delay(1000);
+    }
+  } while (!SD_flag);
   delay(1000);
 
 
@@ -117,7 +100,9 @@ void setup() {
 
 
 void loop() {
-  while (true) {
+  unsigned long stopLoggingMillis = minutesAtStopLogging * 60UL * 1000UL;
+
+  while (millis() < stopLoggingMillis) {
 
     // BMP180
     Temperature = bmp.readTemperature();
@@ -142,7 +127,14 @@ void loop() {
     writeToFile(buffer, completeFileName);
 
     dataIndex++;
-    delay(3000);
+    delay(1000 / logsPerSecond);
+  }
+
+  while (true) {
+    digitalWrite(buzzerPin, HIGH);
+    delay(landOffDelay);
+    digitalWrite(buzzerPin, LOW);
+    delay(landOffDelay);
   }
 }
 
@@ -156,53 +148,6 @@ void doBuzzer(uint16_t delayMs) {
 }
 
 
-void readConfigFile() {
-  File configFile;
-
-  configFile = SD.open("CONFIG.TXT");
-
-  if (configFile) {
-    while (configFile.available()) {
-      String line = configFile.readStringUntil('\n');
-
-      if (line.startsWith("#") || line.length() == 0) {
-        continue;
-      }
-
-      // Parse the key-value pair
-      int separatorIndex = line.indexOf('=');
-      if (separatorIndex != -1) {
-        String key = line.substring(0, separatorIndex);
-        String value = line.substring(separatorIndex + 1);
-
-        key.trim();
-        value.trim();
-
-        if (key.equals("mode")) {
-          mode = value.toInt();
-        } else if (key.equals("logging_frequency")) {
-          loggingFrequency = value.toInt();
-        } else if (key.equals("sea_level_pressure")) {
-          seaLevelPressure = value.toFloat();
-        }
-      }
-    }
-
-    configFile.close();
-  } else {
-    Serial.println("Error opening CONFIG.TXT file!");
-    Serial.println("Default values assigned.");
-  }
-
-  Serial.print("mode: ");
-  Serial.println(mode);
-  Serial.print("logging_frequency: ");
-  Serial.println(loggingFrequency);
-  Serial.print("sea_level_pressure: ");
-  Serial.println(seaLevelPressure);
-}
-
-
 void initNewFile(const char* fileName) {
   int fileNumber = 0;
 
@@ -213,14 +158,12 @@ void initNewFile(const char* fileName) {
 
   File dataFile = SD.open(completeFileName, FILE_WRITE);
   if (dataFile) {
-    Serial.print("File created: ");
-    Serial.println(completeFileName);
+    Serial.println("File created: " + String(completeFileName));
     dataFile.close();
   } else {
     Serial.println("Error creating file!");
     completeFileName[0] = '\0';  // Empty the completeFileName string
   }
-
 }
 
 
