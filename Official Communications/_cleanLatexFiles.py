@@ -27,4 +27,4 @@ destination_dir = 'C:/Users/Bocchio/Documents/GitHub/Bocchio_WebSite_Utils/ERT'
 file_to_copy = 'Official Announcement.pdf'
 
 clean_latex_files(directory)
-copy_file(source_dir, destination_dir, file_to_copy)
+# copy_file(source_dir, destination_dir, file_to_copy)
