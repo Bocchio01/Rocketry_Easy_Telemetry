@@ -23,12 +23,14 @@ From a physical point of view, it's interesting to notice that the BMP280 sensor
 In fact, the pressure of the environment decreases with the altitude.
 Moreover, supposing that the perfect gas law is valid and knowing the pressure at the sea level, it's possible to compute the altitude of the rocket.
 
-Starting from the perfect gas law and the Stevino's law, it's possible to derive the following formula:
+Starting from the perfect gas law and the Stevino's law, it's possible to derive the following formulas:
 
 ```math
-\delta p = -\rho g \delta h \rightarrow \delta h = -\frac{\delta p}{\rho g} \\
+\Delta p = -\rho g \Delta h \rightarrow \Delta h = -\frac{\Delta p}{\rho g} \\
+```
 
-P = \rho \frac{RT}{M} \rightarrow \frac{\delta p}{p} = \delta ln\left(p) = -\fraq{gM}{RT}\delta h \\
+```math
+P = \rho \frac{RT}{M} \rightarrow \frac{\Delta p}{p} = \Delta ln\left(p\right) = -\frac{gM}{RT}\Delta h \\
 ```
 
 Finally, combining the two equations above, it's possible to obtain the following formula:
