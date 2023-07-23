@@ -26,9 +26,9 @@ Moreover, supposing that the perfect gas law is valid and knowing the pressure a
 Starting from the perfect gas law and the Stevino's law, it's possible to derive the following formula:
 
 ```math
-\delta p = -\rho g \delta h \rightarrow \delta h = -\frac{\delta p}{\rho g} \\
+\Delta p = -\rho g \Delta h \rightarrow \Delta h = -\frac{\Delta p}{\rho g} \\
 
-P = \rho \frac{RT}{M} \rightarrow \frac{\delta p}{p} = \delta ln\left(p) = -\fraq{gM}{RT}\delta h \\
+P = \rho \frac{RT}{M} \rightarrow \frac{\Delta p}{p} = \Delta ln\left(p\right) = -\frac{gM}{RT}\Delta h \\
 ```
 
 Finally, combining the two equations above, it's possible to obtain the following formula:
